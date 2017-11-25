@@ -6,3 +6,9 @@ before_script:
   - chmod +x ./kubectl
   - sudo mv ./kubectl /usr/local/bin/kubectl
   - kubectl version
+  - kubectl config set-cluster local --server=https://$KUBE_API --certificate-authority=ca.pem
+  - kubectl config set-credentials $KUBE_USER --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
+  - kubectl config set-context default-system --cluster=default-cluster --user=$KUBE_USER
+  - kubectl config use-context default-system
+  - kubectl config view
+  - kubectl version
