@@ -5,9 +5,9 @@ before_script:
   - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
   - sudo mv ./kubectl /usr/local/bin/kubectl
-  - echo "$KUBE_CA" > ca.pem
-  - echo "$KUBE_CLIENT_KEY" > admin-key.pem
-  - echo "$KUBE_CLIENT_CERT" > admin.pem
+  - echo "$KUBE_CA" | base64 --decode > ca.pem
+  - echo "$KUBE_CLIENT_KEY" | base64 --decode > admin-key.pem
+  - echo "$KUBE_CLIENT_CERT" | base64 --decode > admin.pem
   - cat ca.pem
 
   - kubectl config set-cluster default-cluster --server="https://$KUBE_API" --certificate-authority=ca.pem
