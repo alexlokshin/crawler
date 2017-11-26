@@ -1,6 +1,13 @@
 language: node_js
 node_js:
   - "stable"
+  
+services:
+  - docker
+cache:
+   directories:
+     - node_modules
+     
 before_script:
   - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
   - chmod +x ./kubectl
@@ -17,3 +24,9 @@ before_script:
   - kubectl config view
   - kubectl version
   - kubectl get nodes
+  - npm install
+script:
+  - npm test
+  - docker build -t alexlokshin/crawler .
+after_script:
+  - docker push alexlokshin/crawler:latest
