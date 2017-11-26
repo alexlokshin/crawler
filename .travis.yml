@@ -29,4 +29,5 @@ script:
   - npm test
   - docker build -t alexlokshin/crawler .
 after_script:
+  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push alexlokshin/crawler:latest
