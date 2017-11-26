@@ -9,9 +9,9 @@ before_script:
   - echo "$KUBE_CLIENT_KEY" > admin-key.pem
   - echo "$KUBE_CLIENT_CERT" > admin.pem
 
-  - kubectl config set-cluster local --server="https://$KUBE_API" --certificate-authority=ca.pem
-  - kubectl config set-credentials "$KUBE_USER" --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
-  - kubectl config set-context default-system --cluster=default-cluster --user="$KUBE_USER"
+  - kubectl config set-cluster default-cluster --server="https://$KUBE_API" --certificate-authority=ca.pem
+  - kubectl config set-credentials admin --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
+  - kubectl config set-context default-system --cluster=default-cluster --user=admin
   - kubectl config use-context default-system
   - kubectl config view
   - kubectl version
