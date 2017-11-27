@@ -35,6 +35,7 @@ after_script:
   - docker push "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
   - docker push alexlokshin/crawler:latest
   - kubectl create ns services || true
+  - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/k8s.yml
   - kubectl apply -f ./k8s/k8s.yml -n services
 branches:
   only:
