@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: crawler-service
+spec:
+  selector:
+    app: crawler
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
