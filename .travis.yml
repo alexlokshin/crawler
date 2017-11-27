@@ -29,4 +29,7 @@ script:
   - docker build -t alexlokshin/crawler .
 after_script:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - if [ ! -z "$TRAVIS_TAG" ]; then export IMAGE_TAG=$TRAVIS_TAG; else export IMAGE_TAG=$TRAVIS_BRANCH; fi
+  - docker push "alexlokshin/crawler:$TRAVIS_TAG"
+  - docker push "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
   - docker push alexlokshin/crawler:latest
