@@ -26,7 +26,7 @@ before_script:
   - npm install
 script:
   - npm test
-  - docker build alexlokshin/crawler .
+  - docker build -t alexlokshin/crawler .
 after_script:
   - ( set -o posix ; set ) | less
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
