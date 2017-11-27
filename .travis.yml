@@ -37,7 +37,8 @@ after_script:
   - kubectl create ns services || true
   - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/k8s.yml
   - cat ./k8s/k8s.yml
-  - if [[ $(kubectl get pods -n services  | grep -i crawler-deployment) != "" ]]; then
+  - if [ $(kubectl get deployment crawler-deployment > /dev/null 2>&1; echo $?) -eq 0 ]; 
+    then
       echo "Replacing the application"
       cat ./k8s/k8s.yml | kubectl replace -f -
     else
