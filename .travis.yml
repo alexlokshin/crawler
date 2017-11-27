@@ -26,12 +26,12 @@ before_script:
   - npm install
 script:
   - npm test
-  - docker build .
+  - docker build alexlokshin/crawler .
 after_script:
   - ( set -o posix ; set ) | less
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker tag "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
-  - docker tag alexlokshin/crawler:latest
+  - docker tag alexlokshin/crawler "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
+  - docker tag alexlokshin/crawler alexlokshin/crawler:latest
   - docker push "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
   - docker push alexlokshin/crawler:latest
   - kubectl create ns services || true
