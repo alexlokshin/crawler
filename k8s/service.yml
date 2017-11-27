@@ -2,6 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: crawler-service
+  namespace: services
 spec:
   selector:
     app: crawler

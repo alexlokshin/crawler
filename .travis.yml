@@ -38,15 +38,15 @@ after_script:
   - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/deployment.yml
   - cat ./k8s/k8s.yml
   - | 
-    if [ $(kubectl get deployment crawler-deployment > /dev/null 2>&1; echo $?) -eq 0 ]; 
+    if [ $(kubectl get deployment crawler-deployment -n services > /dev/null 2>&1; echo $?) -eq 0 ]; 
     then 
       echo "Replacing"
       cat ./k8s/deployment.yml | kubectl replace -f -;
     else 
       echo "Creating"
-      kubectl create -f ./k8s/deployment.yml;
+      kubectl create -f ./k8s/deployment.yml -n services;
     fi
-  - kubectl apply -f ./k8s/service.yml
+  - kubectl apply -f ./k8s/service.yml -n services
 branches:
   only:
   - master
