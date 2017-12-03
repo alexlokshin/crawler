@@ -18,7 +18,11 @@
   },
   "homepage": "https://github.com/alexlokshin/crawler#readme",
   "dependencies": {
-    "express": "^4.16.2"
+    "awesome-phonenumber": "^2.2.2",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.2",
+    "parse-address": "0.0.8",
+    "request": "^2.83.0"
   },
   "devDependencies": {
     "mocha": "^4.0.1",
