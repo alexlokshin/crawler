@@ -5,15 +5,17 @@ const request = require('request')
 const parser = require('parse-address')
 const PhoneNumber = require('awesome-phonenumber')
 const emailValidator = require("email-validator");
-const mcache = require('memory-cache');
+const NodeCache = require("node-cache");
+const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 });
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/
 app.get('/breweries', (req, res) => {
 	var cachedResponse = mcache.get('breweries')
-	if (cachedResponse)
+	if (cachedResponse) {
 		res.send({ Status: 'OK', Data: cachedResponse })
+	}
 	else {
 		request('http://beerinflorida.com/florida-brewery-map-list-beer/', function (error, response, html) {
 			if (!error && response.statusCode == 200) {
@@ -87,7 +89,7 @@ app.get('/breweries', (req, res) => {
 					}
 				}
 
-				mcache.put('breweries', response, 3600 * 1000);
+				mcache.set('breweries', response, 3600 * 1000);
 				res.send({ Status: 'OK', Data: response })
 			} else {
 				console.log('Cannot load: ', error)
