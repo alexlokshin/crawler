@@ -16,6 +16,7 @@ app.get('/breweries', (req, res) => {
 			console.log(data.length)
 			var cityBlock = false
 			var children = data.children()
+			var response = []
 			for (var i = 0; i < children.length; i++) {
 
 				var elem = children.get(i)
@@ -32,13 +33,13 @@ app.get('/breweries', (req, res) => {
 					}
 
 					var link = $(elem).find('a').attr('href')
-					var brewery = $(elem).find('a').text()
+					var brewery = $(elem).find('a').text().trim()
 					if (link) {
 						console.log(link.trim())
 					}
 					console.log('*', brewery.trim())
 					var addressLines = []
-					var phone = ''
+
 					for (var t = 0; t < elem.childNodes.length; t++) {
 						var line = $(elem.childNodes[t]).text().trim()
 						if ("a" == elem.childNodes[t].name) {
@@ -50,28 +51,46 @@ app.get('/breweries', (req, res) => {
 
 					var address = ''
 					var phoneNumber = ''
+					var emailAddress = ''
 					for (var a = 0; a < addressLines.length; a++) {
-						if (a < addressLines.length - 1) {
+						if (a == addressLines.length - 1) {
+							var pn = new PhoneNumber(addressLines[a], 'US');
+							if (pn.isValid()) {
+								phoneNumber = addressLines[a]
+							}
+						}
+
+
+						if (phoneNumber.length == 0 && emailAddress.length == 0) {
 							if (address.length > 0)
 								address += ', '
 							address += addressLines[a]
-						} else
-							phoneNumber = addressLines[a]
+						}
 					}
 
-					var parsed = parser.parseLocation(address)
-					console.log('->', address)
-					console.log(JSON.stringify(parsed))
-					console.log('->', phoneNumber)
+					if (address.length > 0 && brewery.length > 0) {
+						var parsedAddress = parser.parseLocation(address)
+						console.log('->', address)
+						console.log(JSON.stringify(parsedAddress))
+						console.log('->', phoneNumber)
+						response.push({
+							brewery: brewery,
+							link: link,
+							phoneNumber: phoneNumber,
+							rawAddress: address,
+							address: parsedAddress
+						})
+					}
 				}
 				else if ("div" == elem.tagName) {
 					break
 				}
 			}
 
-			res.send({ Data: 'OK' })
+			res.send({ Status: 'OK', Data: response })
 		} else {
 			console.log('Cannot load: ', error)
+			res.send({ Status: 'Error' })
 		}
 	})
 })
