@@ -13,7 +13,6 @@ app.get('/breweries', (req, res) => {
 		if (!error && response.statusCode == 200) {
 			var $ = cheerio.load(html)
 			var data = $('#post-2369 > div.entry-content')
-			console.log(data.length)
 			var cityBlock = false
 			var children = data.children()
 			var response = []
@@ -23,9 +22,6 @@ app.get('/breweries', (req, res) => {
 
 				if ("h3" == elem.tagName) {
 					cityBlock = true
-					console.log('')
-					console.log($(elem).text().trim())
-					console.log('---------')
 				}
 				else if (cityBlock) {
 					if ($(elem).children().length > 0 && "em" == $(elem).children().get(0).tagName) {
@@ -34,10 +30,6 @@ app.get('/breweries', (req, res) => {
 
 					var link = $(elem).find('a').attr('href')
 					var brewery = $(elem).find('a').text().trim()
-					if (link) {
-						console.log(link.trim())
-					}
-					console.log('*', brewery.trim())
 					var addressLines = []
 
 					for (var t = 0; t < elem.childNodes.length; t++) {
@@ -70,9 +62,6 @@ app.get('/breweries', (req, res) => {
 
 					if (address.length > 0 && brewery.length > 0) {
 						var parsedAddress = parser.parseLocation(address)
-						console.log('->', address)
-						console.log(JSON.stringify(parsedAddress))
-						console.log('->', phoneNumber)
 						response.push({
 							brewery: brewery,
 							link: link,
