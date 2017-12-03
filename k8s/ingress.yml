@@ -5,6 +5,7 @@ metadata:
   namespace: services
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - http:
