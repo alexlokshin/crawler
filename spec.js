@@ -8,9 +8,14 @@ describe('loading express', function () {
     server.close();
   });
   it('responds to /', function testSlash(done) {
-  request(server)
-    .get('/')
-    .expect(200, done);
+    request(server)
+      .get('/')
+      .expect(200, done);
+  });
+  it('responds to /breweries', function testSlash(done) {
+    request(server)
+      .get('/')
+      .expect(200, done);
   });
   it('404 everything else', function testPath(done) {
     request(server)
