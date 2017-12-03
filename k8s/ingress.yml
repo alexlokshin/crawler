@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: crawler-ingress
   namespace: services
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
   - http:
