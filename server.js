@@ -53,16 +53,27 @@ function parseBreweries(html){
 				break
 			}
 
-			var link = $(elem).find('a').attr('href')
-			var brewery = $(elem).find('a').text().trim()
+			var linkElement = $(elem).find('a')
+			var link = linkElement.attr('href')
+			var brewery = linkElement.text().trim()
 			var addressLines = []
+			linkElement.remove()
+			
+			var childNodes = elem.childNodes
+			for (var t = 0; t < childNodes.length; t++) {
+				if ("p" == childNodes[t].name) {
+					childNodes = childNodes[t].childNodes
+					break
+				}
+			}
 
-			for (var t = 0; t < elem.childNodes.length; t++) {
-				var line = $(elem.childNodes[t]).text().trim()
-				if ("a" == elem.childNodes[t].name) {
-				} else if ("br" == elem.childNodes[t].name) {
+			for (var t = 0; t < childNodes.length; t++) {
+				var line = $(childNodes[t]).text().trim()
+				if ("a" == childNodes[t].name) {
+				} else if ("br" == childNodes[t].name) {
 				} else if (line.length > 0) {
-					addressLines.push(line)
+					if (line.indexOf('at ')!=0 && line!='*')
+						addressLines.push(line)
 				}
 			}
 
@@ -89,13 +100,18 @@ function parseBreweries(html){
 			}
 
 			if (address.length > 0 && brewery.length > 0) {
+				if ('*'==brewery.charAt(0))
+					brewery = brewery.substring(1, brewery.length-1).trim()
+				brewery = brewery.replace(' (temporary)','').trim()
+				brewery = brewery.replace(' (secon','').trim()
+
 				var parsedAddress = parser.parseLocation(address)
 				response.push({
 					brewery: brewery,
 					link: link,
 					phoneNumber: phoneNumber,
 					rawAddress: address,
-					address: parsedAddress
+					zip: parsedAddress?parsedAddress.zip:''
 				})
 			}
 		}
