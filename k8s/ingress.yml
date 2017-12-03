@@ -1,0 +1,9 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: crawler-ingress
+  namespace: services
+spec:
+  backend:
+    serviceName: crawler-service
+    servicePort: 80
