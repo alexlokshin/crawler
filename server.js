@@ -4,6 +4,7 @@ const cheerio = require('cheerio')
 const request = require('request')
 const parser = require('parse-address')
 const PhoneNumber = require('awesome-phonenumber')
+const emailValidator = require("email-validator");
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
@@ -46,9 +47,14 @@ app.get('/breweries', (req, res) => {
 					var emailAddress = ''
 					for (var a = 0; a < addressLines.length; a++) {
 						if (a == addressLines.length - 1) {
-							var pn = new PhoneNumber(addressLines[a], 'US');
+							var textLine = addressLines[a]
+							var pn = new PhoneNumber(textLine, 'US');
 							if (pn.isValid()) {
-								phoneNumber = addressLines[a]
+								phoneNumber = textLine
+							} else {
+								if (emailValidator.validate(textLine)){
+									emailAddress = textLine
+								}
 							}
 						}
 
