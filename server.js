@@ -82,10 +82,10 @@ function parseBreweries(html){
 			var emailAddress = ''
 			for (var a = 0; a < addressLines.length; a++) {
 				if (a == addressLines.length - 1) {
-					var textLine = addressLines[a]
+					var textLine = addressLines[a].replace('\n','').trim()
 					var pn = new PhoneNumber(textLine, 'US');
 					if (pn.isValid()) {
-						phoneNumber = textLine.replace('\n','').trim()
+						phoneNumber = textLine.replace('\\','').replace().trim()
 					} else {
 						if (emailValidator.validate(textLine)) {
 							emailAddress = textLine
@@ -95,7 +95,7 @@ function parseBreweries(html){
 				if (phoneNumber.length == 0 && emailAddress.length == 0) {
 					if (address.length > 0)
 						address += ', '
-					address += addressLines[a]
+					address += addressLines[a].replace('\n', ', ')
 				}
 			}
 
@@ -105,7 +105,7 @@ function parseBreweries(html){
 				brewery = brewery.replace(' (temporary)','').trim()
 				brewery = brewery.replace(' (secon','').trim()
 
-				var parsedAddress = parser.parseLocation(address.replace('\n', ', '))
+				var parsedAddress = parser.parseLocation(address)
 				response.push({
 					brewery: brewery,
 					link: link,

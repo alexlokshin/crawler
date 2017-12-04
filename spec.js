@@ -22,6 +22,11 @@ describe('loading express', function () {
       .expect('Content-Type', /json/)
       .expect(function(res){
         assert(res.body.Data.length>0)  
+        for (var b in res.body.Data){
+          if (!res.body.Data[b].zip)
+            console.log(res.body.Data[b].brewery,'missing a zip')
+          //assert(res.body.Data[b].zip)
+        }
       })
       .end(done)
   })
