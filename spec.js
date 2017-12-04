@@ -17,7 +17,7 @@ describe('loading express', function () {
   })
   it('responds to /breweries', function testSlash(done) {
     request(server)
-      .get('/breweries')
+      .get('/breweries/')
       .expect(200)
       .expect('Content-Type', /json/)
       .expect(function(res){

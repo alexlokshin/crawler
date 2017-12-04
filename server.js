@@ -11,7 +11,7 @@ const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 });
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/
-app.get('/breweries', (req, res) => {
+app.get('/breweries/', (req, res) => {
 	var cachedResponse = mcache.get('breweries')
 	if (cachedResponse) {
 		res.send({ Status: 'OK', Data: cachedResponse })
@@ -58,7 +58,7 @@ function parseBreweries(html){
 			var brewery = linkElement.text().trim()
 			var addressLines = []
 			linkElement.remove()
-			
+
 			var childNodes = elem.childNodes
 			for (var t = 0; t < childNodes.length; t++) {
 				if ("p" == childNodes[t].name) {
