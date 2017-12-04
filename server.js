@@ -85,7 +85,7 @@ function parseBreweries(html){
 					var textLine = addressLines[a]
 					var pn = new PhoneNumber(textLine, 'US');
 					if (pn.isValid()) {
-						phoneNumber = textLine
+						phoneNumber = textLine.replace('\n','').trim()
 					} else {
 						if (emailValidator.validate(textLine)) {
 							emailAddress = textLine
@@ -105,7 +105,7 @@ function parseBreweries(html){
 				brewery = brewery.replace(' (temporary)','').trim()
 				brewery = brewery.replace(' (secon','').trim()
 
-				var parsedAddress = parser.parseLocation(address)
+				var parsedAddress = parser.parseLocation(address.replace('\n', ', '))
 				response.push({
 					brewery: brewery,
 					link: link,
