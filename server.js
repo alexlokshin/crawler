@@ -67,13 +67,29 @@ function parseBreweries(html) {
 				}
 			}
 
+			if (brewery == 'Charlie & Jake’s Brewery Grille'){
+				console.log()
+			}
+
+
+			var newLine = true
 			for (var t = 0; t < childNodes.length; t++) {
 				var line = $(childNodes[t]).text().trim()
 				if ("a" == childNodes[t].name) {
 				} else if ("br" == childNodes[t].name) {
+				} else if ("sup" == childNodes[t].name) {
+					if (addressLines.length>0){
+						addressLines[addressLines.length-1] = addressLines[addressLines.length-1]+line
+						newLine = false
+					}
 				} else if (line.length > 0) {
-					if (line.indexOf('at ') != 0 && line != '*')
-						addressLines.push(line)
+					if (line.indexOf('at ') != 0 && line.indexOf('(') != 0&& line != '*'){
+						if (newLine)
+							addressLines.push(line)
+						else
+							addressLines[addressLines.length-1] = addressLines[addressLines.length-1]+line
+					}
+					newLine = true
 				}
 			}
 
@@ -95,7 +111,7 @@ function parseBreweries(html) {
 				if (phoneNumber.length == 0 && emailAddress.length == 0) {
 					if (address.length > 0)
 						address += ', '
-					address += addressLines[a].replace('\n', ', ')
+					address += addressLines[a].replace('\n', ', ').replace('No. ', '#')
 				}
 			}
 
