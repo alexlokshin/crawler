@@ -34,9 +34,9 @@ var server = app.listen(3000, () => {
 	var port = server.address().port;
 	console.log('Started the server on port %s.', port)
 })
-module.exports = server
 
-function parseBreweries(html){
+
+function parseBreweries(html) {
 	var $ = cheerio.load(html)
 	var data = $('#post-2369 > div.entry-content')
 	var cityBlock = false
@@ -72,7 +72,7 @@ function parseBreweries(html){
 				if ("a" == childNodes[t].name) {
 				} else if ("br" == childNodes[t].name) {
 				} else if (line.length > 0) {
-					if (line.indexOf('at ')!=0 && line!='*')
+					if (line.indexOf('at ') != 0 && line != '*')
 						addressLines.push(line)
 				}
 			}
@@ -82,10 +82,10 @@ function parseBreweries(html){
 			var emailAddress = ''
 			for (var a = 0; a < addressLines.length; a++) {
 				if (a == addressLines.length - 1) {
-					var textLine = addressLines[a].replace('\n','').trim()
+					var textLine = addressLines[a].replace('\n', '').trim()
 					var pn = new PhoneNumber(textLine, 'US');
 					if (pn.isValid()) {
-						phoneNumber = textLine.replace('\\','').replace().trim()
+						phoneNumber = textLine.replace('\\', '').replace().trim()
 					} else {
 						if (emailValidator.validate(textLine)) {
 							emailAddress = textLine
@@ -100,10 +100,10 @@ function parseBreweries(html){
 			}
 
 			if (address.length > 0 && brewery.length > 0) {
-				if ('*'==brewery.charAt(0))
-					brewery = brewery.substring(1, brewery.length-1).trim()
-				brewery = brewery.replace(' (temporary)','').trim()
-				brewery = brewery.replace(' (secon','').trim()
+				if ('*' == brewery.charAt(0))
+					brewery = brewery.substring(1, brewery.length - 1).trim()
+				brewery = brewery.replace(' (temporary)', '').trim()
+				brewery = brewery.replace(' (secon', '').trim()
 
 				var parsedAddress = parser.parseLocation(address)
 				response.push({
@@ -111,7 +111,7 @@ function parseBreweries(html){
 					link: link,
 					phoneNumber: phoneNumber,
 					rawAddress: address,
-					zip: parsedAddress?parsedAddress.zip:''
+					zip: parsedAddress ? parsedAddress.zip : ''
 				})
 			}
 		}
@@ -121,3 +121,5 @@ function parseBreweries(html){
 	}
 	return response
 }
+
+module.exports = server

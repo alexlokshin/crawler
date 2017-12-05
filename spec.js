@@ -1,5 +1,6 @@
 var request = require('supertest')
 var assert = require('assert')
+var beerAdvocateApi = require('./beeradvocate')
 
 describe('loading express', function () {
   var server;
@@ -20,11 +21,11 @@ describe('loading express', function () {
       .get('/breweries/')
       .expect(200)
       .expect('Content-Type', /json/)
-      .expect(function(res){
-        assert(res.body.Data.length>0)  
-        for (var b in res.body.Data){
+      .expect(function (res) {
+        assert(res.body.Data.length > 0)
+        for (var b in res.body.Data) {
           if (!res.body.Data[b].zip)
-            console.log(res.body.Data[b].brewery,'missing a zip')
+            console.log(res.body.Data[b].brewery, 'missing a zip')
           //assert(res.body.Data[b].zip)
         }
       })
@@ -34,5 +35,17 @@ describe('loading express', function () {
     request(server)
       .get('/unexpected')
       .expect(404, done)
+  })
+  it('BA API Works', function (done) {
+    beerAdvocateApi.findBrewery('due south', function(err, results){
+      if (err) 
+        done(err)
+      else{
+        assert(results.length>0)
+        assert(results[0].link.length>0)
+        assert.equal(results[0].location.toLowerCase(), 'boynton beach, florida')
+        done()
+      }
+    })
   })
 })
