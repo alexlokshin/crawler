@@ -60,6 +60,7 @@ after_script:
         echo --------------------------- 
         kubectl logs $p -n ${NAMESPACE}
     done
+  - curl -sS ${INGRESS_URL}  
 branches:
   only:
   - master
