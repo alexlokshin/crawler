@@ -7,7 +7,7 @@
 Mikrotik requires the following to forward ports through the router.
 
 ```
-add action=dst-nat chain=dstnat disabled=no dst-port=yyyy in-interface=ether1-gateway protocol=tcp to-addresses=192.168.xx.xx to-ports=xxxx
+add action=dst-nat chain=dstnat disabled=no dst-port=PUBLIC_PORT in-interface=ether1-gateway protocol=tcp to-addresses=WEB_SERVER_IP to-ports=PRIVATE_PORT
 ```
 
 In addition, to be able to access your public IP from within the LAN, a Hairpin NAT needs to be configured (https://wiki.mikrotik.com/wiki/Hairpin_NAT). For example:
