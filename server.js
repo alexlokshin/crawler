@@ -41,33 +41,6 @@ app.get('/k8s/ns/list', (req, res) => {
 	}
 })
 
-app.get('/k8s/deployments/list', (req, res) => {
-	if (!coreClient) {
-		res.send({ Status: 'Error', error: 'Core client not created' })
-	} else {
-		var namespace = 'default'
-		if (req.query.ns && req.query.ns.trim().length > 0) {
-			namespace = req.query.ns.trim()
-		}
-		coreClient.namespaces(namespace).deployments.get((err, data) => {
-			if (err) {
-				console.log('Error:', err)
-				res.send({ Status: 'Error', error: err.toString() })
-			} else {
-				var list = []
-				if (data && data.items) {
-					data.items.forEach(function (item) {
-						if (item && item.metadata) {
-							list.push(item.metadata.name)
-						}
-					})
-				}
-				res.send({ Status: 'OK', deployments: list, data: data })
-			}
-		})
-	}
-})
-
 app.get('/k8s/pods/list', (req, res) => {
 	if (!coreClient) {
 		res.send({ Status: 'Error', error: 'Core client not created' })
@@ -80,7 +53,7 @@ app.get('/k8s/pods/list', (req, res) => {
 		if (req.query.deployment && req.query.deployment.trim().length > 0) {
 			deployment = req.query.deployment.trim()
 		}
-		coreClient.namespaces(namespace).deployments(deployment).get((err, data) => {
+		coreClient.namespaces(namespace).pods.get((err, data) => {
 			if (err) {
 				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
@@ -89,7 +62,9 @@ app.get('/k8s/pods/list', (req, res) => {
 				if (data && data.items) {
 					data.items.forEach(function (item) {
 						if (item && item.metadata) {
-							list.push(item.metadata.name)
+							if (item.metadata.name.indexOf(deployment+'-')==0){
+								list.push(item.metadata.name)
+							}
 						}
 					})
 				}
