@@ -5,10 +5,22 @@ const request = require('request')
 const parser = require('parse-address')
 const PhoneNumber = require('awesome-phonenumber')
 const emailValidator = require("email-validator");
-const NodeCache = require("node-cache");
-const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 });
+const NodeCache = require("node-cache")
+const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 })
+
+const KubeApi = require('kubernetes-client')
+const coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
+
+app.get('/k8s', (req, res) => {
+	coreClient.namespaces.get((err, data) => {
+		if (err){
+			console.log('Error:',err)
+		}
+		res.send({ error: err.toString(), data: data })
+	});
+})
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/
 app.get('/breweries/', (req, res) => {
@@ -67,7 +79,7 @@ function parseBreweries(html) {
 				}
 			}
 
-			if (brewery == 'Charlie & Jake’s Brewery Grille'){
+			if (brewery == 'Charlie & Jake’s Brewery Grille') {
 				console.log()
 			}
 
@@ -78,16 +90,16 @@ function parseBreweries(html) {
 				if ("a" == childNodes[t].name) {
 				} else if ("br" == childNodes[t].name) {
 				} else if ("sup" == childNodes[t].name) {
-					if (addressLines.length>0){
-						addressLines[addressLines.length-1] = addressLines[addressLines.length-1]+line
+					if (addressLines.length > 0) {
+						addressLines[addressLines.length - 1] = addressLines[addressLines.length - 1] + line
 						newLine = false
 					}
 				} else if (line.length > 0) {
-					if (line.indexOf('at ') != 0 && line.indexOf('(') != 0&& line != '*'){
+					if (line.indexOf('at ') != 0 && line.indexOf('(') != 0 && line != '*') {
 						if (newLine)
 							addressLines.push(line)
 						else
-							addressLines[addressLines.length-1] = addressLines[addressLines.length-1]+line
+							addressLines[addressLines.length - 1] = addressLines[addressLines.length - 1] + line
 					}
 					newLine = true
 				}

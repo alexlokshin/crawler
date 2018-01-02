@@ -22,6 +22,7 @@
     "cheerio": "^1.0.0-rc.2",
     "email-validator": "^1.1.1",
     "express": "^4.16.2",
+    "kubernetes-client": "^3.17.1",
     "node-cache": "^4.1.1",
     "parse-address": "0.0.8",
     "request": "^2.83.0"
