@@ -46,8 +46,8 @@ app.get('/k8s/pods/list', (req, res) => {
 		res.send({ Status: 'Error', error: 'Core client not created' })
 	} else {
 		var namespace = 'default'
-		if (req.param.ns && req.param.ns.trim().length>0){
-			namespace = req.param.ns.trim()
+		if (req.params.ns && req.params.ns.trim().length>0){
+			namespace = req.params.ns.trim()
 		}
 		coreClient.namespaces(namespace).pods.get((err, data) => {
 			if (err){
