@@ -7,20 +7,55 @@ const PhoneNumber = require('awesome-phonenumber')
 const emailValidator = require("email-validator");
 const NodeCache = require("node-cache")
 const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 })
+const detectMocha = require('detect-mocha')
+const KubeApi = require('kubernetes-client')
+let coreClient = null
+if (!detectMocha){
+    coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
+}
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
-app.get('/k8s', (req, res) => {
-	const KubeApi = require('kubernetes-client')
-    const coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
-	coreClient.namespaces.get((err, data) => {
-		if (err){
-			console.log('Error:',err)
-			res.send({ Status: 'Error', error: err.toString() })
-		} else {
-			res.send({ Status: 'OK', data: data })
+app.get('/k8s/ns/list', (req, res) => {
+	if (!coreClient){
+		res.send({ Status: 'Error', error: 'Core client not created' })
+	} else {
+		coreClient.namespaces.get((err, data) => {
+			if (err){
+				console.log('Error:',err)
+				res.send({ Status: 'Error', error: err.toString() })
+			} else {
+				var namespaces = []
+				if (data && data.items){
+					data.items.forEach(function(item){
+						if (item && item.metadata){
+							namespaces.push(item.metadata.name)
+						}
+					})
+				}
+				res.send({ Status: 'OK', namespaces: namespaces })
+			}
+		})
+	}
+})
+
+app.get('/k8s/pods/list', (req, res) => {
+	if (!coreClient){
+		res.send({ Status: 'Error', error: 'Core client not created' })
+	} else {
+		var namespace = 'default'
+		if (req.param.ns && req.param.ns.trim().length>0){
+			namespace = req.param.ns.trim()
 		}
-	});
+		coreClient.namespaces(namespace).pods.get((err, data) => {
+			if (err){
+				console.log('Error:',err)
+				res.send({ Status: 'Error', error: err.toString() })
+			} else {
+				res.send({ Status: 'OK', data: data })
+			}
+		})
+	}
 })
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/

@@ -20,6 +20,7 @@
   "dependencies": {
     "awesome-phonenumber": "^2.2.2",
     "cheerio": "^1.0.0-rc.2",
+    "detect-mocha": "^0.1.0",
     "email-validator": "^1.1.1",
     "express": "^4.16.2",
     "kubernetes-client": "^3.17.1",
