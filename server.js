@@ -7,11 +7,13 @@ const PhoneNumber = require('awesome-phonenumber')
 const emailValidator = require("email-validator");
 const NodeCache = require("node-cache")
 const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 })
-const detectMocha = require('detect-mocha')
 const KubeApi = require('kubernetes-client')
 let coreClient = null
-if (!detectMocha){
+
+try{
     coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
+} catch (err){
+	console.log('Cannot instantiate core client: ', err.toString())
 }
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
