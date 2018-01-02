@@ -8,12 +8,11 @@ const emailValidator = require("email-validator");
 const NodeCache = require("node-cache")
 const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 })
 
-const KubeApi = require('kubernetes-client')
-const coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
-
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
 app.get('/k8s', (req, res) => {
+	const KubeApi = require('kubernetes-client')
+    const coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
 	coreClient.namespaces.get((err, data) => {
 		if (err){
 			console.log('Error:',err)
