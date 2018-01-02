@@ -10,27 +10,27 @@ const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 })
 const KubeApi = require('kubernetes-client')
 let coreClient = null
 
-try{
-    coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
-} catch (err){
+try {
+	coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
+} catch (err) {
 	console.log('Cannot instantiate core client: ', err.toString())
 }
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
 app.get('/k8s/ns/list', (req, res) => {
-	if (!coreClient){
+	if (!coreClient) {
 		res.send({ Status: 'Error', error: 'Core client not created' })
 	} else {
 		coreClient.namespaces.get((err, data) => {
-			if (err){
-				console.log('Error:',err)
+			if (err) {
+				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
 				var list = []
-				if (data && data.items){
-					data.items.forEach(function(item){
-						if (item && item.metadata){
+				if (data && data.items) {
+					data.items.forEach(function (item) {
+						if (item && item.metadata) {
 							list.push(item.metadata.name)
 						}
 					})
@@ -42,22 +42,22 @@ app.get('/k8s/ns/list', (req, res) => {
 })
 
 app.get('/k8s/deployments/list', (req, res) => {
-	if (!coreClient){
+	if (!coreClient) {
 		res.send({ Status: 'Error', error: 'Core client not created' })
 	} else {
 		var namespace = 'default'
-		if (req.query.ns && req.query.ns.trim().length>0){
+		if (req.query.ns && req.query.ns.trim().length > 0) {
 			namespace = req.query.ns.trim()
 		}
 		coreClient.namespaces(namespace).deployments.get((err, data) => {
-			if (err){
-				console.log('Error:',err)
+			if (err) {
+				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
 				var list = []
-				if (data && data.items){
-					data.items.forEach(function(item){
-						if (item && item.metadata){
+				if (data && data.items) {
+					data.items.forEach(function (item) {
+						if (item && item.metadata) {
 							list.push(item.metadata.name)
 						}
 					})
@@ -69,26 +69,26 @@ app.get('/k8s/deployments/list', (req, res) => {
 })
 
 app.get('/k8s/pods/list', (req, res) => {
-	if (!coreClient){
+	if (!coreClient) {
 		res.send({ Status: 'Error', error: 'Core client not created' })
 	} else {
 		var namespace = 'default'
-		if (req.query.ns && req.query.ns.trim().length>0){
+		if (req.query.ns && req.query.ns.trim().length > 0) {
 			namespace = req.query.ns.trim()
 		}
 		var deployment = ''
-		if (req.query.deployment && req.query.deployment.trim().length>0){
+		if (req.query.deployment && req.query.deployment.trim().length > 0) {
 			deployment = req.query.deployment.trim()
 		}
 		coreClient.namespaces(namespace).deployments(deployment).get((err, data) => {
-			if (err){
-				console.log('Error:',err)
+			if (err) {
+				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
 				var list = []
-				if (data && data.items){
-					data.items.forEach(function(item){
-						if (item && item.metadata){
+				if (data && data.items) {
+					data.items.forEach(function (item) {
+						if (item && item.metadata) {
 							list.push(item.metadata.name)
 						}
 					})
@@ -100,28 +100,28 @@ app.get('/k8s/pods/list', (req, res) => {
 })
 
 app.get('/k8s/pod/log', (req, res) => {
-	if (!coreClient){
+	if (!coreClient) {
 		res.send({ Status: 'Error', error: 'Core client not created' })
 	} else {
 		var namespace = 'default'
-		if (req.query.ns && req.query.ns.trim().length>0){
+		if (req.query.ns && req.query.ns.trim().length > 0) {
 			namespace = req.query.ns.trim()
 		}
 		var pod = ''
-		if (req.query.pod && req.query.pod.trim().length>0){
+		if (req.query.pod && req.query.pod.trim().length > 0) {
 			pod = req.query.pod.trim()
 		}
 
 		coreClient.namespaces(namespace).pods(pod).log.get((err, data) => {
-			if (err){
-				console.log('Error:',err)
+			if (err) {
+				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
 				res.send({ Status: 'OK', data: data })
 			}
 		})
 	}
-}
+})
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/
 app.get('/breweries/', (req, res) => {
@@ -179,11 +179,6 @@ function parseBreweries(html) {
 					break
 				}
 			}
-
-			if (brewery == 'Charlie & Jake’s Brewery Grille') {
-				console.log()
-			}
-
 
 			var newLine = true
 			for (var t = 0; t < childNodes.length; t++) {
