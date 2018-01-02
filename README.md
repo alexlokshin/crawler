@@ -16,3 +16,8 @@ In addition, to be able to access your public IP from within the LAN, a Hairpin 
 add chain=dstnat dst-address=PUBLIC_IP protocol=tcp dst-port=PUBLIC_PORT action=dst-nat to-address=WEB_SERVER_IP to-port=PRIVATE_PORT
 add chain=srcnat src-address=192.168.88.0/24 dst-address=WEB_SERVER_IP protocol=tcp dst-port=PRIVATE_PORT out-interface=bridge-local action=masquerade
 ```
+
+To allow Kubernetes related api calls on an RBAC-enabled cluster, make sure to 
+```
+kubectl apply -f k8s/rbac.yml
+```

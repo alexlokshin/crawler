@@ -16,8 +16,10 @@ app.get('/k8s', (req, res) => {
 	coreClient.namespaces.get((err, data) => {
 		if (err){
 			console.log('Error:',err)
+			res.send({ Status: 'Error', error: err.toString() })
+		} else {
+			res.send({ Status: 'OK', data: data })
 		}
-		res.send({ error: err.toString(), data: data })
 	});
 })
 
