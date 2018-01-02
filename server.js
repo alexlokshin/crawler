@@ -92,7 +92,7 @@ app.get('/k8s/pod/log', (req, res) => {
 				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
-				res.send({ Status: 'OK', data: data })
+				res.send({ Status: 'OK', log: data.split(/\r?\n/) })
 			}
 		})
 	}
