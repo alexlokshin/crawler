@@ -27,15 +27,42 @@ app.get('/k8s/ns/list', (req, res) => {
 				console.log('Error:',err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
-				var namespaces = []
+				var list = []
 				if (data && data.items){
 					data.items.forEach(function(item){
 						if (item && item.metadata){
-							namespaces.push(item.metadata.name)
+							list.push(item.metadata.name)
 						}
 					})
 				}
-				res.send({ Status: 'OK', namespaces: namespaces })
+				res.send({ Status: 'OK', namespaces: list, data: data })
+			}
+		})
+	}
+})
+
+app.get('/k8s/deployments/list', (req, res) => {
+	if (!coreClient){
+		res.send({ Status: 'Error', error: 'Core client not created' })
+	} else {
+		var namespace = 'default'
+		if (req.query.ns && req.query.ns.trim().length>0){
+			namespace = req.query.ns.trim()
+		}
+		coreClient.namespaces(namespace).deployments.get((err, data) => {
+			if (err){
+				console.log('Error:',err)
+				res.send({ Status: 'Error', error: err.toString() })
+			} else {
+				var list = []
+				if (data && data.items){
+					data.items.forEach(function(item){
+						if (item && item.metadata){
+							list.push(item.metadata.name)
+						}
+					})
+				}
+				res.send({ Status: 'OK', deployments: list, data: data })
 			}
 		})
 	}
@@ -49,7 +76,43 @@ app.get('/k8s/pods/list', (req, res) => {
 		if (req.query.ns && req.query.ns.trim().length>0){
 			namespace = req.query.ns.trim()
 		}
-		coreClient.namespaces(namespace).pods.get((err, data) => {
+		var deployment = ''
+		if (req.query.deployment && req.query.deployment.trim().length>0){
+			deployment = req.query.deployment.trim()
+		}
+		coreClient.namespaces(namespace).deployments(deployment).get((err, data) => {
+			if (err){
+				console.log('Error:',err)
+				res.send({ Status: 'Error', error: err.toString() })
+			} else {
+				var list = []
+				if (data && data.items){
+					data.items.forEach(function(item){
+						if (item && item.metadata){
+							list.push(item.metadata.name)
+						}
+					})
+				}
+				res.send({ Status: 'OK', pods: list, data: data })
+			}
+		})
+	}
+})
+
+app.get('/k8s/pod/log', (req, res) => {
+	if (!coreClient){
+		res.send({ Status: 'Error', error: 'Core client not created' })
+	} else {
+		var namespace = 'default'
+		if (req.query.ns && req.query.ns.trim().length>0){
+			namespace = req.query.ns.trim()
+		}
+		var pod = ''
+		if (req.query.pod && req.query.pod.trim().length>0){
+			pod = req.query.pod.trim()
+		}
+
+		coreClient.namespaces(namespace).pods(pod).log.get((err, data) => {
 			if (err){
 				console.log('Error:',err)
 				res.send({ Status: 'Error', error: err.toString() })
@@ -58,7 +121,7 @@ app.get('/k8s/pods/list', (req, res) => {
 			}
 		})
 	}
-})
+}
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/
 app.get('/breweries/', (req, res) => {
