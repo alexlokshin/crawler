@@ -14,3 +14,26 @@ spec:
         backend:
           serviceName: crawler-service
           servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: crawler-ingress
+  namespace: services
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+    - avsatum.com
+    secretName: crawler-tls
+  rules:
+  - host: avsatum.com
+    http:
+      paths:
+      - path: /crawler
+        backend:
+          serviceName: crawler-service
+          servicePort: 80
