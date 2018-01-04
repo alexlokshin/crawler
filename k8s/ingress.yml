@@ -18,7 +18,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: crawler-ingress
+  name: crawler-tls-ingress
   namespace: services
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
