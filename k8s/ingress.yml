@@ -27,13 +27,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - avsatum.com
+    - www.avsatum.com
     secretName: crawler-tls
   rules:
-  - host: avsatum.com
+  - host: www.avsatum.com
     http:
       paths:
-      - path: /crawler
+      - path: /
         backend:
           serviceName: crawler-service
           servicePort: 80
