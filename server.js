@@ -18,6 +18,46 @@ try {
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
+app.get('/health', (req, res) => {
+    if (!coreClient) {
+        res.send({ Status: 'Error', error: 'No k8s context available.' })
+    } else {
+        coreClient.nodes.get((err, data) => {
+            if (err) {
+                console.log('Error:', err)
+                res.send({ Status: 'Error', error: err.toString() })
+            } else {
+                var healthy = true
+                var unhealthyNodes = []
+                var error = ''
+                var nodes = []
+
+                try{
+                    if (data && data.items) {
+                        data.items.forEach(function (item) {
+                            if (item && item.spec && item.status) {
+                                item.status.conditions.forEach(function(condition){
+                                    if ("Ready"==condition.type){
+                                        if ("True"!=condition.status){
+                                            unhealthyNodes.push(item.spec.externalID)
+                                            healthy = false
+                                        }
+                                    }
+                                    nodes.push({ID: item.spec.externalID, Condition: condition.status})
+                                })
+                            }
+                        })
+                    }
+                } catch(err){
+                    error = err.toString()
+                }
+                
+                res.status(healthy?200:500).send({ Healthy: healthy, Nodes: nodes, UnhealthyNodes: unhealthyNodes, Error: error })
+            }
+        })
+    }
+})
+
 app.get('/k8s/ns/list', (req, res) => {
 	if (!coreClient) {
 		res.send({ Status: 'Error', error: 'Core client not created' })
