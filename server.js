@@ -36,6 +36,7 @@ app.get('/health', (req, res) => {
                     if (data && data.items) {
                         data.items.forEach(function (item) {
                             if (item && item.spec && item.status) {
+                                var conditions = []
                                 item.status.conditions.forEach(function(condition){
                                     if ("Ready"==condition.type){
                                         if ("True"!=condition.status){
@@ -43,8 +44,9 @@ app.get('/health', (req, res) => {
                                             healthy = false
                                         }
                                     }
-                                    nodes.push({ID: item.spec.externalID, Condition: condition.status})
+                                    conditions.push({Type: condition.type, Status: condition.status})
                                 })
+                                nodes.push({ID: item.spec.externalID, Conditions: conditions})
                             }
                         })
                     }
