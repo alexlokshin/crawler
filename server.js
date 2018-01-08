@@ -9,16 +9,18 @@ const NodeCache = require("node-cache")
 const mcache = new NodeCache({ stdTTL: 36000, checkperiod: 18000 })
 const KubeApi = require('kubernetes-client')
 let coreClient = null
+let kubeConfig = null
 
 try {
-	coreClient = new KubeApi.Core(KubeApi.config.getInCluster())
+	kubeConfig = KubeApi.config.getInCluster()
+	coreClient = new KubeApi.Core(kubeConfig)
 } catch (err) {
 	console.log('Cannot instantiate core client: ', err.toString())
 }
 
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
-app.get('/health', (req, res) => {
+app.get('/k8s/health', (req, res) => {
     if (!coreClient) {
         res.send({ Status: 'Error', error: 'No k8s context available.' })
     } else {
@@ -58,6 +60,53 @@ app.get('/health', (req, res) => {
             }
         })
     }
+})
+
+app.get('/deployments/list', (req, res) => {
+    if (!kubeConfig) {
+        res.send({ Status: 'Error', error: 'No k8s context available.' })
+    } else {
+        var extClient = new kubeApi.Extensions(kubeConfig)
+        var namespace = 'default'
+        if (req.query.ns && req.query.ns.trim().length > 0) {
+            namespace = req.query.ns.trim()
+        }
+        extClient.namespaces(namespace).deployments.get((err, data) => {
+            if (err) {
+                console.log('Error:', err)
+                res.send({ Status: 'Error', error: err.toString() })
+            } else {
+                var list = []
+                if (data && data.items) {
+                    data.items.forEach(function (item) {
+                        if (item && item.metadata) {
+                            list.push(item.metadata.name)
+                        }
+                    })
+                }
+                res.send({ Status: 'OK', deployments: list })
+            }
+        })
+    }
+})
+
+app.get('/k8s/events', (req, res) => {
+	if (!coreClient) {
+		res.send({ Status: 'Error', error: 'Core client not created' })
+	} else {
+		var namespace = 'default'
+		if (req.query.ns && req.query.ns.trim().length > 0) {
+			namespace = req.query.ns.trim()
+		}
+		coreClient.events.get((err, data) => {
+			if (err) {
+				console.log('Error:', err)
+				res.send({ Status: 'Error', error: err.toString() })
+			} else {
+				res.send({ Status: 'OK',  data: data })
+			}
+		})
+	}
 })
 
 app.get('/k8s/ns/list', (req, res) => {
@@ -105,7 +154,7 @@ app.get('/k8s/pods/list', (req, res) => {
 					data.items.forEach(function (item) {
 						if (item && item.metadata) {
 							if (item.metadata.name.indexOf(deployment+'-')==0){
-								list.push(item.metadata.name)
+								list.push({name: item.metadata.name, status: item.status})
 							}
 						}
 					})
