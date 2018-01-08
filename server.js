@@ -103,7 +103,27 @@ app.get('/k8s/events', (req, res) => {
 				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
-				res.send({ Status: 'OK',  data: data })
+				var events = []
+				if (data && data.items) {
+                    data.items.forEach(function (item) {
+                        if (item && item.metadata) {
+							list.push({name: item.metadata.name, 
+								namespace: item.metadata.namespace,
+								involvedObject:{
+									kind: item.involvedObject.kind,
+									namespace: item.involvedObject.namespaces,
+									name: item.involvedObject.name
+								},
+								reason: item.reason,
+								message: item.message,
+								source: item.source,
+								firstTimestamp: item.firstTimestamp,
+								lastTimestamp: item.lastTimestamp
+							})
+                        }
+                    })
+                }
+				res.send({ Status: 'OK',  events: events })
 			}
 		})
 	}
