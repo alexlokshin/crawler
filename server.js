@@ -21,7 +21,7 @@ try {
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
 app.get('/k8s/health', (req, res) => {
-    if (!coreClient) {
+    if (!coreClient	) {
         res.send({ Status: 'Error', error: 'No k8s context available.' })
     } else {
         coreClient.nodes.get((err, data) => {
@@ -62,11 +62,11 @@ app.get('/k8s/health', (req, res) => {
     }
 })
 
-app.get('/deployments/list', (req, res) => {
+app.get('/k8s/deployments/list', (req, res) => {
     if (!kubeConfig) {
         res.send({ Status: 'Error', error: 'No k8s context available.' })
     } else {
-        var extClient = new kubeApi.Extensions(kubeConfig)
+        var extClient = new KubeApi.Extensions(kubeConfig)
         var namespace = 'default'
         if (req.query.ns && req.query.ns.trim().length > 0) {
             namespace = req.query.ns.trim()
