@@ -103,7 +103,7 @@ app.get('/k8s/events', (req, res) => {
 				console.log('Error:', err)
 				res.send({ Status: 'Error', error: err.toString() })
 			} else {
-				var events = []
+				var list = []
 				if (data && data.items) {
                     data.items.forEach(function (item) {
                         if (item && item.metadata) {
@@ -123,7 +123,7 @@ app.get('/k8s/events', (req, res) => {
                         }
                     })
                 }
-				res.send({ Status: 'OK',  events: events })
+				res.send({ Status: 'OK',  events: list })
 			}
 		})
 	}
