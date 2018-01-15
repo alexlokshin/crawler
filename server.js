@@ -21,7 +21,7 @@ try {
 app.get('/', (req, res) => res.send({ Status: 'OK' }))
 
 app.get('/k8s/health', (req, res) => {
-    if (!coreClient	) {
+    if (!coreClient) {
         res.send({ Status: 'Error', error: 'No k8s context available.' })
     } else {
         coreClient.nodes.get((err, data) => {
@@ -207,6 +207,35 @@ app.get('/k8s/pod/log', (req, res) => {
 			}
 		})
 	}
+})
+
+router.get('/k8s/deployment/ingresses', (req, res) => {
+    if (!kubeConfig) {
+        res.send({ Status: 'Error', error: 'No k8s context available.' })
+    } else {
+        var namespace = 'default'
+        if (req.query.ns && req.query.ns.trim().length > 0) {
+            namespace = req.query.ns.trim()
+        }
+        var deployment = ''
+        if (req.query.deployment && req.query.deployment.trim().length > 0) {
+            deployment = req.query.deployment.trim()
+        }
+	    
+	var extClient = new KubeApi.Extensions(kubeConfig)
+        extClient.namespaces(namespace).ingresses.get((err, data) => {
+            if (err) {
+                console.log('Error:', err)
+                res.send({ Status: 'Error', error: err.toString() })
+            } else {
+                if (err) {
+			res.send({ Status: 'Error', error: err.toString() })
+		    } else {
+			res.send({ Status: 'OK', data: data })
+		    }
+            }
+        })
+    }
 })
 
 // Dynamically crawls http://beerinflorida.com/florida-brewery-map-list-beer/
