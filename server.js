@@ -209,7 +209,7 @@ app.get('/k8s/pod/log', (req, res) => {
 	}
 })
 
-router.get('/k8s/deployment/ingresses', (req, res) => {
+app.get('/k8s/deployment/ingresses', (req, res) => {
     if (!kubeConfig) {
         res.send({ Status: 'Error', error: 'No k8s context available.' })
     } else {
