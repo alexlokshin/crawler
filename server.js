@@ -228,10 +228,21 @@ app.get('/k8s/deployment/ingresses', (req, res) => {
                 console.log('Error:', err)
                 res.send({ Status: 'Error', error: err.toString() })
             } else {
+		var ingresses = []
+		var list = []
+		if (data && data.items) {
+			data.items.forEach(function (item) {
+				if (item && item.metadata) {
+					if (item.metadata.name.indexOf(deployment+'-')==0){
+						ingresses.push({name: item.metadata.name, rules: item.spec.rules})
+					}
+				}
+			})
+		}
                 if (err) {
 			res.send({ Status: 'Error', error: err.toString() })
 		    } else {
-			res.send({ Status: 'OK', data: data })
+			res.send({ Status: 'OK', ingresses: ingresses })
 		    }
             }
         })
