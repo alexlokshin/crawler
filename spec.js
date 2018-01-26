@@ -10,7 +10,7 @@ describe('loading express', function () {
   afterEach(function () {
     server.close()
   })
-  it('responds to /', function testSlash(done) {
+  it('responds to /health', function testSlash(done) {
     request(server)
       .get('/')
       .expect(200, done)
