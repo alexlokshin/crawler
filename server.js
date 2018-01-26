@@ -22,6 +22,15 @@ try {
 app.use(express.static(path.join(__dirname, 'public')))
 app.get('/health', (req, res) => res.send({ Status: 'OK' }))
 
+app.get('/k8s/count', (req, res) => {
+	coreClient.nodes.get((err, data) => {
+		if (err)
+			res.send({Status: 'Error', error:  err.toString() })
+		else
+			res.send({Status: 'OK', NodeCount: data.items.length })
+	})
+})
+
 app.get('/k8s/health', (req, res) => {
     if (!coreClient) {
         res.send({ Status: 'Error', error: 'No k8s context available.' })
