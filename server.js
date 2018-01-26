@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path');
 const app = express()
 const cheerio = require('cheerio')
 const request = require('request')
@@ -18,7 +19,8 @@ try {
 	console.log('Cannot instantiate core client: ', err.toString())
 }
 
-app.get('/', (req, res) => res.send({ Status: 'OK' }))
+app.use(express.static(path.join(__dirname, 'public')))
+app.get('/health', (req, res) => res.send({ Status: 'OK' }))
 
 app.get('/k8s/health', (req, res) => {
     if (!coreClient) {
