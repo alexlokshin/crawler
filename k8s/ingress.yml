@@ -4,7 +4,7 @@ metadata:
   name: crawler-ingress
   namespace: services
   annotations:
-    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/ssl-redirect: "true"
     ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
@@ -21,7 +21,7 @@ metadata:
   name: crawler-tls-ingress
   namespace: services
   annotations:
-    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/ssl-redirect: "true"
     ingress.kubernetes.io/rewrite-target: /
     kubernetes.io/tls-acme: "true"
 spec:
