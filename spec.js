@@ -26,7 +26,6 @@ describe('loading express', function () {
         for (var b in res.body.Data) {
           if (!res.body.Data[b].zip)
             console.log(res.body.Data[b].brewery, 'missing a zip')
-          //assert(res.body.Data[b].zip)
         }
       })
       .end(done)
