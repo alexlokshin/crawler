@@ -12,7 +12,7 @@ describe('loading express', function () {
   })
   it('responds to /health', function testSlash(done) {
     request(server)
-      .get('/')
+      .get('/health')
       .expect(200, done)
       .expect('Content-Type', /json/)
   })
