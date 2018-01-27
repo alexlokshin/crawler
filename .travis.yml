@@ -10,25 +10,18 @@ cache:
      - node_modules
 
 stages:
-  - build_node
   - test
-  - build_docker
+  - build
   - deploy
-
 
 jobs:
   include:
-    - stage: build_node
-      language: node_js
-      node_js: stable
-      script:
-        - npm install
     - stage: test
       language: node_js
       node_js: stable
       script:
         - npm test
-    - stage: build_docker
+    - stage: build
       script:
         - docker build -t alexlokshin/crawler .
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
@@ -37,6 +30,7 @@ jobs:
         - docker push "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
         - docker push alexlokshin/crawler:latest
     - stage: deploy
+      if: branch = master
       script:
         - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
         - chmod +x ./kubectl
@@ -44,7 +38,6 @@ jobs:
         - echo "$KUBE_CA" | base64 --decode > ca.pem
         - echo "$KUBE_CLIENT_KEY" | base64 --decode > admin-key.pem
         - echo "$KUBE_CLIENT_CERT" | base64 --decode > admin.pem
-
         - kubectl config set-cluster default-cluster --server="$KUBE_API" --certificate-authority=ca.pem
         - kubectl config set-credentials admin --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
         - kubectl config set-context default-system --cluster=default-cluster --user=admin
