@@ -10,19 +10,16 @@ cache:
      - node_modules
 
 stages:
-  - test
   - build
   - deploy
 
 jobs:
   include:
-    - stage: test
+    - stage: build
       language: node_js
       node_js: stable
       script:
         - npm test
-    - stage: build
-      script:
         - docker build -t alexlokshin/crawler .
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker tag alexlokshin/crawler "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
