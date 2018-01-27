@@ -1,66 +1,79 @@
-language: node_js
-node_js:
-  - "stable"
+sudo: false
+
 env:
   global:
     - DEPLOYMENT=crawler-deployment
     - NAMESPACE=services
-  
-services:
-  - docker
+
 cache:
    directories:
      - node_modules
-     
-before_script:
-  - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-  - chmod +x ./kubectl
-  - sudo mv ./kubectl /usr/local/bin/kubectl
-  - echo "$KUBE_CA" | base64 --decode > ca.pem
-  - echo "$KUBE_CLIENT_KEY" | base64 --decode > admin-key.pem
-  - echo "$KUBE_CLIENT_CERT" | base64 --decode > admin.pem
 
-  - kubectl config set-cluster default-cluster --server="$KUBE_API" --certificate-authority=ca.pem
-  - kubectl config set-credentials admin --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
-  - kubectl config set-context default-system --cluster=default-cluster --user=admin
-  - kubectl config use-context default-system
-  - kubectl config view
-  - kubectl version
-  - kubectl get nodes
-  - npm install
-script:
-  - npm test
-  - docker build -t alexlokshin/crawler .
-after_script:
-  - ( set -o posix ; set ) | less
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker tag alexlokshin/crawler "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
-  - docker tag alexlokshin/crawler alexlokshin/crawler:latest
-  - docker push "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
-  - docker push alexlokshin/crawler:latest
-  - kubectl create ns ${NAMESPACE} || true
-  - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/deployment.yml
-  - cat ./k8s/k8s.yml
-  - | 
-    if [ $(kubectl get deployment ${DEPLOYMENT} -n ${NAMESPACE} > /dev/null 2>&1; echo $?) -eq 0 ]; 
-    then 
-      echo "Replacing"
-      cat ./k8s/deployment.yml | kubectl replace -f -;
-    else 
-      echo "Creating"
-      kubectl create -f ./k8s/deployment.yml -n ${NAMESPACE};
-    fi
-  - kubectl apply -f ./k8s/service.yml -n ${NAMESPACE}
-  - kubectl apply -f ./k8s/ingress.yml -n ${NAMESPACE}
-  - sleep 30
-  - |
-    for p in $(kubectl get pods -n ${NAMESPACE} | grep ^${DEPLOYMENT}- | cut -f 1 -d ' '); do 
-        echo --------------------------- 
-        echo $p 
-        echo --------------------------- 
-        kubectl logs $p -n ${NAMESPACE}
-    done
-  - curl -sS ${INGRESS_URL}  
-branches:
-  only:
-  - master
+stages:
+  - build_node
+  - test
+  - build_docker
+  - deploy
+
+
+jobs:
+  include:
+    - stage: build_node
+      language: node_js
+      node_js: stable
+      script:
+        - npm install
+    - stage: test
+      language: node_js
+      node_js: stable
+      script:
+        - npm test
+    - stage: build_docker
+      script:
+        - docker build -t alexlokshin/crawler .
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker tag alexlokshin/crawler "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
+        - docker tag alexlokshin/crawler alexlokshin/crawler:latest
+        - docker push "alexlokshin/crawler:$TRAVIS_BUILD_NUMBER"
+        - docker push alexlokshin/crawler:latest
+    - stage: deploy
+      script:
+        - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+        - chmod +x ./kubectl
+        - sudo mv ./kubectl /usr/local/bin/kubectl
+        - echo "$KUBE_CA" | base64 --decode > ca.pem
+        - echo "$KUBE_CLIENT_KEY" | base64 --decode > admin-key.pem
+        - echo "$KUBE_CLIENT_CERT" | base64 --decode > admin.pem
+
+        - kubectl config set-cluster default-cluster --server="$KUBE_API" --certificate-authority=ca.pem
+        - kubectl config set-credentials admin --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
+        - kubectl config set-context default-system --cluster=default-cluster --user=admin
+        - kubectl config use-context default-system
+        - kubectl config view
+        - kubectl version
+        - kubectl get nodes
+        - ( set -o posix ; set ) | less
+        - kubectl create ns ${NAMESPACE} || true
+        - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/deployment.yml
+        - cat ./k8s/k8s.yml
+        - | 
+          if [ $(kubectl get deployment ${DEPLOYMENT} -n ${NAMESPACE} > /dev/null 2>&1; echo $?) -eq 0 ]; 
+          then 
+            echo "Replacing"
+            cat ./k8s/deployment.yml | kubectl replace -f -;
+          else 
+            echo "Creating"
+            kubectl create -f ./k8s/deployment.yml -n ${NAMESPACE};
+          fi
+        - kubectl apply -f ./k8s/service.yml -n ${NAMESPACE}
+        - kubectl apply -f ./k8s/ingress.yml -n ${NAMESPACE}
+        - sleep 30
+        - |
+          for p in $(kubectl get pods -n ${NAMESPACE} | grep ^${DEPLOYMENT}- | cut -f 1 -d ' '); do 
+              echo --------------------------- 
+              echo $p 
+              echo --------------------------- 
+              kubectl logs $p -n ${NAMESPACE}
+          done
+        - curl -sS ${INGRESS_URL}  
+
