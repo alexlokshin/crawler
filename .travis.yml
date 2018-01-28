@@ -57,7 +57,7 @@ jobs:
           fi
         - kubectl apply -f ./k8s/service.yml -n ${NAMESPACE}
         - kubectl apply -f ./k8s/ingress.yml -n ${NAMESPACE}
-        - sleep 30
+        - sleep 60
         - |
           for p in $(kubectl get pods -n ${NAMESPACE} | grep ^${DEPLOYMENT}- | cut -f 1 -d ' '); do 
               echo --------------------------- 
