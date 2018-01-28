@@ -45,7 +45,6 @@ jobs:
         - ( set -o posix ; set ) | less
         - kubectl create ns ${NAMESPACE} || true
         - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/deployment.yml
-        - cat ./k8s/k8s.yml
         - | 
           if [ $(kubectl get deployment ${DEPLOYMENT} -n ${NAMESPACE} > /dev/null 2>&1; echo $?) -eq 0 ]; 
           then 
