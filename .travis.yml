@@ -35,7 +35,7 @@ jobs:
         - echo "$KUBE_CA" | base64 --decode > ca.pem
         - echo "$KUBE_CLIENT_KEY" | base64 --decode > admin-key.pem
         - echo "$KUBE_CLIENT_CERT" | base64 --decode > admin.pem
-        - kubectl config set-cluster default-cluster --server="$KUBE_API" --certificate-authority=ca.pem
+        - kubectl config set-cluster default-cluster --server="$KUBE_API" --certificate-authority=ca.pem --insecure-skip-tls-verify=true
         - kubectl config set-credentials admin --certificate-authority=ca.pem --client-key=admin-key.pem --client-certificate=admin.pem 
         - kubectl config set-context default-system --cluster=default-cluster --user=admin
         - kubectl config use-context default-system
