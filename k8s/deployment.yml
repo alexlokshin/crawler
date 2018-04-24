@@ -16,6 +16,7 @@ spec:
       labels:
         app: crawler
     spec:
+      serviceAccount: crawler-reader
       containers:
       - name: crawler
         image: alexlokshin/crawler:TRAVIS_BUILD_NUMBER
