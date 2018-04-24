@@ -44,6 +44,7 @@ jobs:
         - kubectl get nodes
         - ( set -o posix ; set ) | less
         - kubectl create ns ${NAMESPACE} || true
+        - kubectl apply -f ./k8s/rbac.yml -n ${NAMESPACE}
         - sed -i.bak "s/TRAVIS_BUILD_NUMBER/$TRAVIS_BUILD_NUMBER/g" ./k8s/deployment.yml
         - | 
           if [ $(kubectl get deployment ${DEPLOYMENT} -n ${NAMESPACE} > /dev/null 2>&1; echo $?) -eq 0 ]; 
